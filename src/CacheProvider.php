@@ -54,18 +54,4 @@ class CacheProvider
         $this->times = $hours;
         return $this;
     }
-
-    public function json_2_array($json) {
-        if ($json == '') {
-            return [];
-        }
-        return json_decode($json, true);
-    }
-
-    public function array_2_json(array $array) {
-        if ($array == null) {
-            return '{}';
-        }
-        return json_encode($array);
-    }
 }
