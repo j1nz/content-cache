@@ -1,6 +1,6 @@
 {
     "name": "lovecoding/content-cache",
-    "description": "Caching content before response to client",
+    "description": "A simple package - caching content on server before response to clients, support Slim Framework PHP.",
     "type": "library",
     "authors": [
         {
