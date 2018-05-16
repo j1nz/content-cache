@@ -1,6 +1,6 @@
 <?php
 
-namespace lovecoding\ContentCache;
+namespace LoveCoding\ContentCache;
 
 /**
 * 
@@ -9,7 +9,7 @@ class Utils
 {
     public static function removeFolder($path) {
         if (is_dir($path) === true) {
-            $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::CHILD_FIRST);
+            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::CHILD_FIRST);
 
             foreach ($files as $file) {
                 if (in_array($file->getBasename(), array('.', '..')) !== true) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace lovecoding\ContentCache;
+namespace LoveCoding\ContentCache;
 
 /**
 * 

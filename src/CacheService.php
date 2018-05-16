@@ -1,8 +1,8 @@
 <?php
-namespace lovecoding\ContentCache;
+namespace LoveCoding\ContentCache;
 
 
-class CacheServices {
+class CacheService {
     private static $instance;
     private $datetimeFormat = 'Y-m-d H:i:s';
     private $rootDirCache;
@@ -13,7 +13,7 @@ class CacheServices {
 
     /**
      * @param $rootDirCache
-     * @return CacheServices
+     * @return CacheService
      */
     public static function getInstance($rootDirCache)
     {
