@@ -1,0 +1,20 @@
+{
+    "name": "lovecoding/content-cache",
+    "description": "Caching content before response to client",
+    "type": "library",
+    "authors": [
+        {
+            "name": "thanglt5",
+            "email": "lethethangdn@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.3.0",
+        "psr/http-message": "^1.0",
+        "psr/container": "^1.0"
+    },
+    "autoload": {
+        "psr-4": { "lovecoding\\ContentCache\\": "src/" }
+    }
+}
