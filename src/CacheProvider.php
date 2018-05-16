@@ -12,13 +12,11 @@ class CacheProvider
 {
     
     private $cacheBo;
+    // Default save contents on dish with 4 hours
     private $times = 4;
 
     public function __construct($cacheRootDir) {
-        $globalService = GlobalService::getInstance();
         $this->cacheBo = CacheBO::getInstance($cacheRootDir);
-        //$this->cacheBo->setDatetimeFormat($globalService->setting->get('datetimeFormat'));
-        //date_default_timezone_set($globalService->setting->get('timezone'));
     }
 
     /**
@@ -65,5 +63,33 @@ class CacheProvider
     public function withExpires($hours) {
         $this->times = $hours;
         return $this;
+    }
+
+    public function json_2_array($json) {
+        if ($json == '') {
+            return [];
+        }
+        return json_decode($json, true);
+    }
+
+    public function array_2_json(array $array) {
+        if ($array == null) {
+            return '{}';
+        }
+        return json_encode($array);
+    }
+
+    public function object_2_json($object) {
+        if ($object == null) {
+            return '{}';
+        }
+        return json_encode($object->toArray());
+    }
+
+    public function object_2_array($object) {
+        if ($object == null) {
+            return [];
+        }
+        return json_decode($this->object_2_json($object), true);
     }
 }
