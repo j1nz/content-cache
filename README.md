@@ -48,12 +48,11 @@ $app->get('/cache/array', function ($request, $response, $args) use($container) 
 $app->get('/cache/plaintext', function ($request, $response, $args) use($container) {
     $cacheService = $container->get('cacheService');
 
-    // $cacheService->cache return a json
     $contentCache = $cacheService->cache($request, function() {
         // This function will run when $content is null on server
         // TODO something
 
-        // return something
+        // return and save something you want on server
         return ...;
     });
 
