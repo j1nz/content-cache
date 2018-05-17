@@ -52,9 +52,8 @@ class CacheService {
             return null;
         }
 
-        // Read and convert json to array
+        // Read file content
         $content = $cacheIo->readContentFileCache($requestTargetContent);
-        $arrayContent = $this->json_2_array($content);
 
         // Remove folder content cache if get content fail (may be, when get data occur error so, we will remove unnecessary folder)
         if ($content == null || $content == '') {
@@ -62,7 +61,7 @@ class CacheService {
             return null;
         }
 
-        return $arrayContent;
+        return $content;
     }
 
     /**
@@ -78,9 +77,7 @@ class CacheService {
         $requestTarget = $this->pathGenerator($requestTarget) .'_content';
         $cacheIo = CacheIO::getInstance();
 
-        $jsonContent = $this->array_2_json($content);
-
-        $cacheIo->writeContentFileCache($requestTarget, $jsonContent);
+        $cacheIo->writeContentFileCache($requestTarget, $content);
     }
 
     /**
@@ -129,19 +126,5 @@ class CacheService {
      */
     public function setDatetimeFormat($format) {
         $this->datetimeFormat = $format;
-    }
-
-    public function json_2_array($json) {
-        if ($json == '') {
-            return [];
-        }
-        return json_decode($json, true);
-    }
-
-    public function array_2_json(array $array) {
-        if ($array == null) {
-            return '{}';
-        }
-        return json_encode($array);
     }
 }

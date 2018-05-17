@@ -3,7 +3,6 @@
 namespace LoveCoding\ContentCache;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
 /**
 * 
 */
@@ -17,41 +16,69 @@ class CacheProvider
         $this->cacheService = CacheService::getInstance($cacheRootDir);
     }
 
-    /**
-     * @param Request $request
-     * @param Response $response
-     * @param callable $callable
-     * @return mixed
-     */
-    public function cache(Request $request, Response $response, callable $callable) {
-        $dataContent = null;
+    public function cache(Request $request, callable $callable) {
+        $dataContentCache = null;
 
-        if ($callable && is_callable($callable)) {
-            $content = $this->cacheService->getContent($request->getRequestTarget());
+        $content = $this->cacheService->getContent($request->getRequestTarget());
 
-            if ($content != null) {
-                $dataContent = $content;
-            } else {
-                $dataContent = $callable();
-
-                if ($dataContent != null) {
-                    $this->writeCache($request, $dataContent);
-                }
-            }
+        if ($content != null) {
+            $dataContentCache = $content;
         } else {
-            throw new \InvalidArgumentException('Must be a callback function');
+            $dataContentCache = $callable();
+
+            if ($dataContentCache != null) {
+                $this->writeCache($request, $dataContentCache);
+            }
         }
 
-        return $dataContent;
+        return $dataContentCache;
     }
 
-    public function writeCache(Request $request, array $content) {
-        $this->cacheService->setContent($request->getRequestTarget(), $content);
-        $this->cacheService->setExpires($request->getRequestTarget(), $this->times);
+    public function cacheArray(Request $request, callable $callable) {
+        $dataContentCache = null;
+
+        $content = $this->cacheService->getContent($request->getRequestTarget());
+
+        if ($content != null) {
+            $dataContentCache = $this->json_2_array($content);
+        } else {
+            $array = $callable();
+
+            if ( !$array && !is_array( $array ) ) {
+                throw new \InvalidArgumentException('Callback must be return an array');
+            }
+
+            $dataContentCache = $array;
+
+            if ($dataContentCache != null && $dataContentCache != '{}') {
+                $this->writeCache($request, $this->array_2_json($array));
+            }
+        }
+
+        return $dataContentCache;
     }
 
     public function withExpires($hours) {
         $this->times = $hours;
         return $this;
+    }
+
+    public function json_2_array($json) {
+        if ($json == '') {
+            return [];
+        }
+        return json_decode($json, true);
+    }
+
+    public function array_2_json(array $array) {
+        if ($array == null) {
+            return '{}';
+        }
+        return json_encode($array);
+    }
+
+    private function writeCache(Request $request, $content) {
+        $this->cacheService->setContent($request->getRequestTarget(), $content);
+        $this->cacheService->setExpires($request->getRequestTarget(), $this->times);
     }
 }
