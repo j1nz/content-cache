@@ -27,22 +27,37 @@ $container = $app->getContainer();
 
 $container['cacheService'] = function() {
     // path to folder contains cached
-    return new \LoveCoding\ContentCache\CacheProvider('../storage/cache');
+    return new \LoveCoding\ContentCache\CacheProvider('storage/cache');
 };
 
-$app->get('/hello/{name}', function ($request, $response, $args) use($container) {
+$app->get('/cache/array', function ($request, $response, $args) use($container) {
     $cacheService = $container->get('cacheService');
 
     // $cacheService->cache return a json
-    $contentCache = $cacheService->cache($request, $response, function() {
+    $contentArrayCache = $cacheService->cacheArray($request, function() {
         // This function will run when $content is null on server
         // TODO something
 
-        // return an array
+        // Must return an array
         return ...;
     });
     
-    return $response->withJson($contentCache);
+    return $response->withJson($contentArrayCache);
+});
+
+$app->get('/cache/plaintext', function ($request, $response, $args) use($container) {
+    $cacheService = $container->get('cacheService');
+
+    // $cacheService->cache return a json
+    $contentCache = $cacheService->cache($request, function() {
+        // This function will run when $content is null on server
+        // TODO something
+
+        // return something
+        return ...;
+    });
+
+    return $response->getBody()->write($contentCache);
 });
 
 $app->run();
