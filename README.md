@@ -68,8 +68,5 @@ You may quickly test this using the built-in PHP server:
 $ php -S localhost:8000
 ```
 
-Going to http://localhost:8000/hello/world will now display your content cached.
+Going to http://localhost:8000/cache/array or http://localhost:8000/cache/plaintext will now display your content cached.
 
-## Note
-
-It's only save arrays to json file on dish.
