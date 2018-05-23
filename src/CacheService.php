@@ -5,6 +5,7 @@ namespace LoveCoding\ContentCache;
 class CacheService {
     private static $instance;
     private $datetimeFormat = 'Y-m-d H:i:s';
+    private $timezone = 'Asia/Ho_Chi_Minh';
     private $rootDirCache;
 
     public function __construct($rootDirCache) {
@@ -57,7 +58,9 @@ class CacheService {
 
         // Remove folder content cache if get content fail (may be, when get data occur error so, we will remove unnecessary folder)
         if ($content == null || $content == '') {
-            Utils::removeFolder($this->rootDirCache .$requestTarget);
+            $cacheIo->deleteFileCache($requestTargetContent);
+            $cacheIo->deleteFileExpires($requestTargetExpires);
+            //Utils::removeFolder($this->rootDirCache .$requestTarget);
             return null;
         }
 
@@ -71,7 +74,7 @@ class CacheService {
      * @param array $data
      */
     public function setContent($requestTarget, $content) {
-        $requestTarget = strtolower($requestTarget);
+        //$requestTarget = strtolower($requestTarget);
 
         // create path save file cache
         $requestTarget = $this->pathGenerator($requestTarget) .'_content';
@@ -114,7 +117,7 @@ class CacheService {
         Utils::createMultipleFolder($cacheRootPath);
 
         // create path of file
-        $path = $cacheRootPath .'/' .base64_encode($requestTarget);
+        $path = $cacheRootPath .'/' .strtolower(base64_encode($requestTarget));
 
         return $path;
     }

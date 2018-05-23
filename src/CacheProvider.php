@@ -11,6 +11,7 @@ class CacheProvider
     private $cacheService;
     // Default save contents on dish with 4 hours
     private $times = 4;
+    private $timezone = '';
 
     public function __construct($cacheRootDir) {
         $this->cacheService = CacheService::getInstance($cacheRootDir);
@@ -61,6 +62,10 @@ class CacheProvider
     public function withExpires($hours) {
         $this->times = $hours;
         return $this;
+    }
+
+    public function setTimezone($timezone) {
+        date_default_timezone_set($timezone);
     }
 
     public function json_2_array($json) {
