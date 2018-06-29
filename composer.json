@@ -2,6 +2,7 @@
     "name": "lovecoding/content-cache",
     "description": "A simple package - caching content on server before response to clients, support Slim Framework PHP.",
     "type": "library",
+    "license": "MIT",
     "authors": [
         {
             "name": "thanglt5",
