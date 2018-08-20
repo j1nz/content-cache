@@ -99,7 +99,7 @@ class CacheProvider {
      */
     private function writeCache(Request $request, $content) {
         if ($this->saltAddToPath) {
-            $request = $request->withRequestTarget($request->getRequestTarget() .'_' .$this->saltAddToPath);
+            $request = $request->withRequestTarget($request->getRequestTarget() .'/' .$this->saltAddToPath);
         }
 
         $this->cacheHelper->setContent($request->getRequestTarget(), $content);

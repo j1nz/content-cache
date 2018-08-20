@@ -1,5 +1,5 @@
 <?php
-namespace LoveCoding\CacheHelper;
+namespace LoveCoding\ContentCache;
 
 use RuntimeException;
 
