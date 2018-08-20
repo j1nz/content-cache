@@ -30,10 +30,6 @@ $container['cacheService'] = function() {
     // path to folder contains cached
     $cacheProvider = new \LoveCoding\ContentCache\CacheProvider('storage/cache');
     
-    // add salt to path contains cached file
-    // this is optional
-    $cacheProvider->setSalt('abc');
-    
     return $cacheProvider;
 };
 
@@ -42,6 +38,10 @@ $app->get('/cache/array', function ($request, $response, $args) use($container) 
 
     // $cacheService->cache return a json
     $contentArrayCache = $cacheService->cacheArray($request, function() {
+        // add salt to path contains cached file
+        // this is optional
+        $cacheProvider->setSalt('abc');
+    
         // This function will run when $content is null on server
         // TODO something
 
