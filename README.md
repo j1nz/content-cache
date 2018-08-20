@@ -16,7 +16,7 @@ This will install ContentCache and all required dependencies. ContentCache requi
 
 Create an index.php file with the following contents:
 
-Demo on Slim 3.x
+Demo using Slim 3.x framework
 ```php
 <?php
 
