@@ -1,14 +1,17 @@
 <?php
-namespace LoveCoding\ContentCache;
+namespace LoveCoding\CacheHelper;
 
+use RuntimeException;
 
-class CacheService {
+class CacheHelper {
     private static $instance;
     private $datetimeFormat = 'Y-m-d H:i:s';
     private $timezone = 'Asia/Ho_Chi_Minh';
     private $rootDirCache;
 
     public function __construct($rootDirCache) {
+        // check write permission
+        $this->checkWritePermissionDirectory($rootDirCache);
         $this->rootDirCache = $rootDirCache;
     }
 
@@ -16,8 +19,7 @@ class CacheService {
      * @param $rootDirCache
      * @return CacheService
      */
-    public static function getInstance($rootDirCache)
-    {
+    public static function getInstance($rootDirCache) {
         if (self::$instance == null) {
             self::$instance = new self($rootDirCache);
         }
@@ -60,7 +62,6 @@ class CacheService {
         if ($content == null || $content == '') {
             $cacheIo->deleteFileCache($requestTargetContent);
             $cacheIo->deleteFileExpires($requestTargetExpires);
-            //Utils::removeFolder($this->rootDirCache .$requestTarget);
             return null;
         }
 
@@ -78,6 +79,7 @@ class CacheService {
 
         // create path save file cache
         $requestTarget = $this->pathGenerator($requestTarget) .'_content';
+
         $cacheIo = CacheIO::getInstance();
 
         $cacheIo->writeContentFileCache($requestTarget, $content);
@@ -122,12 +124,56 @@ class CacheService {
         return $path;
     }
 
+    public function checkWritePermissionDirectory($dir) {
+        if (!is_writable(dirname($dir))) {
+            throw new RuntimeException('Cache\'s root directory must be writable');
+        }
+    }
+
     /**
      * Set datetime format
      *
      * @param $format
      */
     public function setDatetimeFormat($format) {
-        $this->datetimeFormat = $format;
+        if ($format !== null) {
+            $this->datetimeFormat = $format;
+        }
+    }
+
+    /**
+     * Set default timezone
+     * @param Datestring $timezone
+     */
+    public function setTimezone($timezone = null) {
+        if ($timezone !== null) {
+            $this->timezone = $timezone; 
+        }
+
+        date_default_timezone_set($this->timezone);
+    }
+
+    /**
+     * Convert json to array object
+     * @param  String $json Json string
+     * @return Array  array
+     */
+    public function json_2_array($json) {
+        if ($json == '') {
+            return [];
+        }
+        return json_decode($json, true);
+    }
+
+    /**
+     * Convert array to json string
+     * @param  array  $array Array object
+     * @return String        Json string
+     */
+    public function array_2_json(array $array) {
+        if ($array == null) {
+            return '{}';
+        }
+        return json_encode($array);
     }
 }

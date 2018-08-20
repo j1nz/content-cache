@@ -2,88 +2,107 @@
 
 namespace LoveCoding\ContentCache;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
+use InvalidArgumentException;
+use Psr\Http\Message\ServerRequestInterface as Request;
+
 /**
-* 
-*/
-class CacheProvider
-{
-    private $cacheService;
+ * Cache content provider
+ * Author: ThangLe
+ */
+class CacheProvider {
+    private $cacheHelper;
     // Default save contents on dish with 4 hours
     private $times = 4;
-    private $timezone = '';
+    private $saltAddToPath;
 
     public function __construct($cacheRootDir) {
-        $this->cacheService = CacheService::getInstance($cacheRootDir);
+        $this->cacheHelper = CacheHelper::getInstance($cacheRootDir);
     }
 
+    /**
+     * Cache any type to cache dir in server
+     * @param  Request  $request
+     * @param  callable $callable
+     * @return mixed
+     */
     public function cache(Request $request, callable $callable) {
         $dataContentCache = null;
 
-        $content = $this->cacheService->getContent($request->getRequestTarget());
+        $content = $this->cacheHelper->getContent($request->getRequestTarget());
 
         if ($content != null) {
             $dataContentCache = $content;
         } else {
             $dataContentCache = $callable();
 
-            if ($dataContentCache != null) {
-                $this->writeCache($request, $dataContentCache);
+            if ( !is_string($dataContentCache) || $dataContentCache === '') {
+                throw new InvalidArgumentException('Callable must be return a string');
             }
+
+            $this->writeCache($request, $dataContentCache);
         }
 
         return $dataContentCache;
     }
 
+    /**
+     * Cache only array to cache dir in server
+     * @param  Request  $request 
+     * @param  callable $callable
+     * @return Array
+     */
     public function cacheArray(Request $request, callable $callable) {
-        $dataContentCache = null;
+        $dataArrayCache = null;
 
-        $content = $this->cacheService->getContent($request->getRequestTarget());
+        $content = $this->cacheHelper->getContent($request->getRequestTarget());
 
         if ($content != null) {
-            $dataContentCache = $this->json_2_array($content);
+            $dataArrayCache = $this->cacheHelper->json_2_array($content);
         } else {
-            $array = $callable();
+            $dataArrayCache = $callable();
 
-            if ( !$array && !is_array( $array ) ) {
-                throw new \InvalidArgumentException('Callback must be return an array');
+            if ( !is_array($dataArrayCache) ) {
+                throw new InvalidArgumentException('Callable must be return an array');
             }
 
-            $dataContentCache = $array;
-
-            if ($dataContentCache != null && $dataContentCache != '{}') {
-                $this->writeCache($request, $this->array_2_json($array));
+            if ($dataArrayCache != '{}') {
+                $this->writeCache($request, $this->cacheHelper->array_2_json($dataArrayCache));
             }
         }
 
-        return $dataContentCache;
+        return $dataArrayCache;
     }
 
+    /**
+     * Set expires hours for content cache 
+     * @param  Integer $hours
+     * @return static        
+     */
     public function withExpires($hours) {
         $this->times = $hours;
         return $this;
     }
 
-    public function setTimezone($timezone) {
-        date_default_timezone_set($timezone);
+    /**
+     * Set add new optional path name into the current path
+     * @param String $salt
+     */
+    public function setSalt($salt) {
+        $this->saltAddToPath = $salt;
     }
 
-    public function json_2_array($json) {
-        if ($json == '') {
-            return [];
-        }
-        return json_decode($json, true);
-    }
-
-    public function array_2_json(array $array) {
-        if ($array == null) {
-            return '{}';
-        }
-        return json_encode($array);
-    }
-
+    /**
+     * Write cache using cache helper class
+     * Write content and expires times
+     * @param  Request $request Get current path
+     * @param  String  $content Content needed cache
+     */
     private function writeCache(Request $request, $content) {
-        $this->cacheService->setContent($request->getRequestTarget(), $content);
-        $this->cacheService->setExpires($request->getRequestTarget(), $this->times);
+        if ($this->saltAddToPath) {
+            $request = $request->withRequestTarget($request->getRequestTarget() .'_' .$this->saltAddToPath);
+        }
+
+        $this->cacheHelper->setContent($request->getRequestTarget(), $content);
+        $this->cacheHelper->setExpires($request->getRequestTarget(), $this->times);
     }
 }
