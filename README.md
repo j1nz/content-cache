@@ -1,6 +1,6 @@
 # LoveCoding\ContentCache
 
-ContentCache is a simple package - for web service (API) that helps you cache your content on server and response to clients - One cached, one time redering for everyone.
+ContentCache is a simple package - for web service or any web need to that helps you cache your content on server. One time handle, more time using.
 
 ## Installation
 
@@ -16,6 +16,7 @@ This will install ContentCache and all required dependencies. ContentCache requi
 
 Create an index.php file with the following contents:
 
+Demo on Slim 3.x
 ```php
 <?php
 
@@ -27,7 +28,13 @@ $container = $app->getContainer();
 
 $container['cacheService'] = function() {
     // path to folder contains cached
-    return new \LoveCoding\ContentCache\CacheProvider('storage/cache');
+    $cacheProvider = new \LoveCoding\ContentCache\CacheProvider('storage/cache');
+    
+    // add salt to path contains cached file
+    // this is optional
+    $cacheProvider->setSalt('abc');
+    
+    return $cacheProvider;
 };
 
 $app->get('/cache/array', function ($request, $response, $args) use($container) {
