@@ -37,7 +37,7 @@ $app->get('/cache/array', function ($request, $response, $args) use($container) 
     $cacheService = $container->get('cacheService');
 
     // $cacheService->cache return a json
-    $contentArrayCache = $cacheService->cacheArray($request, function() {
+    $contentArrayCache = $cacheService->cacheArray($request, function() use($cacheProvider) {
         // add salt to path contains cached file
         // this is optional
         $cacheProvider->setSalt('abc');
