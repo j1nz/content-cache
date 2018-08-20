@@ -1,6 +1,6 @@
 # LoveCoding\ContentCache
 
-ContentCache is a simple package - for web service or any web need to that helps you cache your content on server. One time handle, more time using.
+ContentCache is a simple package - for web service or any web need to that helps you cache your content on server. One time handle, more times using.
 
 ## Installation
 
