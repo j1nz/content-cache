@@ -37,11 +37,8 @@ $app->get('/cache/array', function ($request, $response, $args) use($container) 
     $cacheService = $container->get('cacheService');
 
     // $cacheService->cache return a json
-    $contentArrayCache = $cacheService->cacheArray($request, function() use($cacheProvider) {
-        // add salt to path contains cached file
-        // this is optional
-        $cacheProvider->setSalt('abc');
-    
+    $contentArrayCache = $cacheService->cacheArray($request, function() {
+
         // This function will run when $content is null on server
         // TODO something
 
@@ -49,7 +46,7 @@ $app->get('/cache/array', function ($request, $response, $args) use($container) 
         return ...;
     });
     
-    return $response->withJson($contentArrayCache);
+    return $response->withJson(json_encode($contentArrayCache));
 });
 
 $app->get('/cache/plaintext', function ($request, $response, $args) use($container) {
@@ -64,6 +61,29 @@ $app->get('/cache/plaintext', function ($request, $response, $args) use($contain
     });
 
     return $response->getBody()->write($contentCache);
+});
+
+// Using salt for many content
+$app->get('/cache/plaintext', function ($request, $response, $args) use($container) {
+    $cacheService = $container->get('cacheService');
+
+    $firstList = $cacheService->salt('salt_for_firstList')->cacheArray($request, function() {
+        // This function will run when $content is null on server
+        // TODO something
+
+        // return and save something you want on server
+        return ...;
+    });
+
+    $secondList = $cacheService->salt('salt_for_secondList')->cacheArray($request, function() {
+        // This function will run when $content is null on server
+        // TODO something
+
+        // return and save something you want on server
+        return ...;
+    });
+
+    return $response->withJson(json_encode([$firstList, $secondList]));
 });
 
 $app->run();

@@ -85,10 +85,12 @@ class CacheProvider {
 
     /**
      * Set add new optional path name into the current path
-     * @param String $salt
+     * @param  String $salt
+     * @return static       
      */
-    public function setSalt($salt) {
+    public function salt($salt) {
         $this->saltAddToPath = $salt;
+        return $this;
     }
 
     /**
@@ -98,11 +100,13 @@ class CacheProvider {
      * @param  String  $content Content needed cache
      */
     private function writeCache(Request $request, $content) {
+        $requestTarget = $request->getRequestTarget();
+
         if ($this->saltAddToPath) {
-            $request = $request->withRequestTarget($request->getRequestTarget() .'/' .$this->saltAddToPath);
+            $requestTarget = $requestTarget .'/' .$this->saltAddToPath;
         }
 
-        $this->cacheHelper->setContent($request->getRequestTarget(), $content);
-        $this->cacheHelper->setExpires($request->getRequestTarget(), $this->times);
+        $this->cacheHelper->setContent($requestTarget, $content);
+        $this->cacheHelper->setExpires($requestTarget, $this->times);
     }
 }
