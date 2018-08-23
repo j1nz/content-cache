@@ -1,6 +1,6 @@
 {
     "name": "lovecoding/content-cache",
-    "description": "A simple package - for web service or any web need to that helps you cache your content on server. One time handle, more times using.",
+    "description": "A simple package - for web service made by SLim Framework, that's helps you cache your content on server. One time handle, more times using.",
     "type": "library",
     "license": "MIT",
     "authors": [
