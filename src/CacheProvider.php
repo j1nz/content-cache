@@ -14,6 +14,7 @@ class CacheProvider {
     // Default save contents on dish with 4 hours
     private $times = 4;
     private $saltAddToPath;
+    private $requestTarget;
 
     public function __construct($cacheRootDir) {
         $this->cacheHelper = CacheHelper::getInstance($cacheRootDir);
@@ -54,7 +55,11 @@ class CacheProvider {
     public function cacheArray(Request $request, callable $callable) {
         $dataArrayCache = null;
 
-        $content = $this->cacheHelper->getContent($request->getRequestTarget());
+        if ($this->requestTarget) {
+            $content = $this->cacheHelper->getContent($this->requestTarget);
+        } else {
+            $content = $this->cacheHelper->getContent($request->getRequestTarget());
+        }
 
         if ($content != null) {
             $dataArrayCache = $this->cacheHelper->json_2_array($content);
@@ -69,6 +74,9 @@ class CacheProvider {
                 $this->writeCache($request, $this->cacheHelper->array_2_json($dataArrayCache));
             }
         }
+
+        $this->saltAddToPath = null;
+        $this->requestTarget = null;
 
         return $dataArrayCache;
     }
@@ -94,6 +102,16 @@ class CacheProvider {
     }
 
     /**
+     * Custome request target when don't want use tradiotional way
+     * @param  String $target Replace $request->getRequestTarget() is default
+     * @return static
+     */
+    public function customRequestTarget($target) {
+        $this->requestTarget = $target;
+        return $this;
+    }
+
+    /**
      * Write cache using cache helper class
      * Write content and expires times
      * @param  Request $request Get current path
@@ -101,6 +119,10 @@ class CacheProvider {
      */
     private function writeCache(Request $request, $content) {
         $requestTarget = $request->getRequestTarget();
+
+        if ($this->requestTarget) {
+            $requestTarget = $this->requestTarget;
+        }
 
         if ($this->saltAddToPath) {
             $requestTarget = $requestTarget .'/' .$this->saltAddToPath;
