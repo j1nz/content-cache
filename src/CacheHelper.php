@@ -109,17 +109,19 @@ class CacheHelper {
      * @return string $path the path of file to cache
      */
     public function pathGenerator($requestTarget) {
-        $autoFolder = urldecode(
+        $unsafeDirectoryPath = urldecode(
             parse_url($requestTarget, PHP_URL_PATH)
         );
 
-        $cacheRootPath = $this->rootDirCache .$autoFolder;
+        $safeDirectoryPath = md5($unsafeDirectoryPath);
+
+        $cacheRootPath = $this->rootDirCache .'/' .$safeDirectoryPath;
 
         // create folder with path if it's not exist.
         Utils::createMultipleFolder($cacheRootPath);
 
         // create path of file
-        $path = $cacheRootPath .'/' .strtolower(base64_encode($requestTarget));
+        $path = $cacheRootPath .'/' .md5($requestTarget);
 
         return $path;
     }
