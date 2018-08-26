@@ -29,7 +29,7 @@ class CacheProvider {
     public function cache(Request $request, callable $callable) {
         $dataContentCache = null;
 
-        $content = $this->cacheHelper->getContent($request->getRequestTarget());
+        $content = $this->readCache($request);
 
         if ($content != null) {
             $dataContentCache = $content;
@@ -43,6 +43,8 @@ class CacheProvider {
             $this->writeCache($request, $dataContentCache);
         }
 
+        $this->rollbackPropertiesDefault();
+
         return $dataContentCache;
     }
 
@@ -55,11 +57,7 @@ class CacheProvider {
     public function cacheArray(Request $request, callable $callable) {
         $dataArrayCache = null;
 
-        if ($this->requestTarget) {
-            $content = $this->cacheHelper->getContent($this->requestTarget);
-        } else {
-            $content = $this->cacheHelper->getContent($request->getRequestTarget());
-        }
+        $content = $this->readCache($request);
 
         if ($content != null) {
             $dataArrayCache = $this->cacheHelper->json_2_array($content);
@@ -75,8 +73,7 @@ class CacheProvider {
             }
         }
 
-        $this->saltAddToPath = null;
-        $this->requestTarget = null;
+        $this->rollbackPropertiesDefault();
 
         return $dataArrayCache;
     }
@@ -92,7 +89,7 @@ class CacheProvider {
     }
 
     /**
-     * Set add new optional path name into the current path
+     * Add new optional path name into the current path
      * @param  String $salt
      * @return static       
      */
@@ -118,6 +115,28 @@ class CacheProvider {
      * @param  String  $content Content needed cache
      */
     private function writeCache(Request $request, $content) {
+        $requestTarget = $this->createTargetPath($request);
+
+        $this->cacheHelper->setContent($requestTarget, $content);
+        $this->cacheHelper->setExpires($requestTarget, $this->times);
+    }
+
+    /**
+     * Read cache from disk
+     * @param  Request $request Client request
+     * @return mixed           Content have been cached
+     */
+    private function readCache(Request $request) {
+        $requestTarget = $this->createTargetPath($request);
+        return $this->cacheHelper->getContent($requestTarget);
+    }
+
+    /**
+     * generetor path to disk content cache
+     * @param  Request $request Client request
+     * @return String           Target path to disk content cache
+     */
+    private function createTargetPath(Request $request) {
         $requestTarget = $request->getRequestTarget();
 
         if ($this->requestTarget) {
@@ -128,7 +147,15 @@ class CacheProvider {
             $requestTarget = $requestTarget .'/' .$this->saltAddToPath;
         }
 
-        $this->cacheHelper->setContent($requestTarget, $content);
-        $this->cacheHelper->setExpires($requestTarget, $this->times);
+        return $requestTarget;
+    }
+
+    /**
+     * Set default value for properties
+     */
+    private function rollbackPropertiesDefault() {
+        $this->saltAddToPath = null;
+        $this->requestTarget = null;
+        $this->times = 4;
     }
 }
