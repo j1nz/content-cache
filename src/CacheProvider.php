@@ -88,6 +88,11 @@ class CacheProvider {
         return $this;
     }
 
+    public function isNeverExpires() {
+        $this->cacheHelper->isExpires(false);
+        return $this;
+    }
+
     /**
      * Add new optional path name into the current path
      * @param  String $salt
@@ -157,5 +162,6 @@ class CacheProvider {
         $this->saltAddToPath = null;
         $this->requestTarget = null;
         $this->times = 4;
+        $this->cacheHelper->isExpires(true);
     }
 }

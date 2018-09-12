@@ -7,6 +7,7 @@ class CacheHelper {
     private static $instance;
     private $datetimeFormat = 'Y-m-d H:i:s';
     private $timezone = 'Asia/Ho_Chi_Minh';
+    private $isExpires = true;
     private $rootDirCache;
 
     public function __construct($rootDirCache) {
@@ -26,6 +27,10 @@ class CacheHelper {
         return self::$instance;
     }
 
+    public function isExpires(bool $isExpires) {
+        $this->isExpires = $isExpires;
+    }
+
     /**
      * Get content in cache, if now > than time expires => delete old file cache and return null
      * If cache is exist and now < time expires => get content => return content by array
@@ -38,21 +43,24 @@ class CacheHelper {
 
         // Create path base on request of end-user, this path is dir content cache file
         $requestTargetContent = $this->pathGenerator($requestTarget) .'_content';
-        $requestTargetExpires = $this->pathGenerator($requestTarget) .'_schedule';
 
-        // Get current time (now) and time config cache
-        $timeNow = date($this->datetimeFormat);
-        $timeCraw = $cacheIo->readExpires($requestTargetExpires);
+        if ($this->isExpires) {
+            $requestTargetExpires = $this->pathGenerator($requestTarget) .'_schedule';
 
-        // Convert datetime to timestamp
-        $timeCrawStamp = strtotime($timeCraw);
-        $timeNowStamp = strtotime($timeNow);
+            // Get current time (now) and time config cache
+            $timeNow = date($this->datetimeFormat);
+            $timeCraw = $cacheIo->readExpires($requestTargetExpires);
 
-        // Compared time now and time expires, now > time expires => delete old file cache
-        if ($timeNowStamp > $timeCrawStamp) {
-            $cacheIo->deleteFileCache($requestTargetContent);
-            $cacheIo->deleteFileExpires($requestTargetExpires);
-            return null;
+            // Convert datetime to timestamp
+            $timeCrawStamp = strtotime($timeCraw);
+            $timeNowStamp = strtotime($timeNow);
+
+            // Compared time now and time expires, now > time expires => delete old file cache
+            if ($timeNowStamp > $timeCrawStamp) {
+                $cacheIo->deleteFileCache($requestTargetContent);
+                $cacheIo->deleteFileExpires($requestTargetExpires);
+                return null;
+            }
         }
 
         // Read file content
@@ -61,7 +69,9 @@ class CacheHelper {
         // Remove folder content cache if get content fail (may be, when get data occur error so, we will remove unnecessary folder)
         if ($content == null || $content == '') {
             $cacheIo->deleteFileCache($requestTargetContent);
-            $cacheIo->deleteFileExpires($requestTargetExpires);
+            if ($this->isExpires) {
+                $cacheIo->deleteFileExpires($requestTargetExpires);
+            }
             return null;
         }
 
@@ -97,11 +107,13 @@ class CacheHelper {
      * @param int $year
      */
     public function setExpires($requestTarget, $hours = 0, $minutes = 0, $second = 0, $day = 0, $month = 0, $year = 0) {
-        // create path save file contain time expires
-        $requestTarget = $this->pathGenerator($requestTarget) .'_schedule';
+        if ($this->isExpires) {
+            // create path save file contain time expires
+            $requestTarget = $this->pathGenerator($requestTarget) .'_schedule';
 
-        $cacheIo = CacheIO::getInstance();
-        $cacheIo->writeExpires($requestTarget, $this->datetimeFormat, $hours, $minutes, $second, $day, $month, $year);
+            $cacheIo = CacheIO::getInstance();
+            $cacheIo->writeExpires($requestTarget, $this->datetimeFormat, $hours, $minutes, $second, $day, $month, $year);
+        }
     }
 
     /**
