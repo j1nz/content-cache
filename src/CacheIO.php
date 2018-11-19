@@ -9,10 +9,6 @@ class CacheIO
 {
     private static $instance;
 
-    public function __construct() {
-
-    }
-
     /**
      * @return mixed
      */
@@ -29,7 +25,8 @@ class CacheIO
      * @param $file
      * @return bool|null|string
      */
-    public function readContentFileCache($file) {
+    public function readContentFileCache(string $file)
+    {
         $content = null;
         $checkFile = false;
 
@@ -67,7 +64,8 @@ class CacheIO
      * @param $file
      * @param $content
      */
-    public function writeContentFileCache($file, $content) {
+    public function writeContentFileCache(string $file, string $content)
+    {
         $writeFile = @fopen($file, "w+");
 
         @fwrite($writeFile, $content);
@@ -79,9 +77,10 @@ class CacheIO
      *
      * @param string $file
      */
-    public function deleteFileCache($file) {
+    public function deleteFileCache($file)
+    {
         if (file_exists($file)) {
-            unlink($file);
+            @unlink($file);
         }
     }
 
@@ -91,7 +90,8 @@ class CacheIO
      * @param $file
      * @return bool|null|string
      */
-    public function readExpires($file) {
+    public function readExpires(string $file)
+    {
         $data = null;
         $checkFile = false;
 
@@ -130,7 +130,9 @@ class CacheIO
      * @param int $month
      * @param int $year
      */
-    public function writeExpires($file, $format, $hours = 0, $minutes = 0, $second = 0, $day = 0, $month = 0, $year = 0) {
+    public function writeExpires(string $file, string $format, int $hours = 0, int $minutes = 0,
+            int $second = 0, int $day = 0, int $month = 0, int $year = 0)
+    {
         $datetime = getdate();
 
         $alarm = mktime (($datetime['hours'] + $hours), ($datetime['minutes'] + $minutes), ($datetime['seconds'] + $second),
@@ -149,9 +151,10 @@ class CacheIO
      *
      * @param $file
      */
-    public function deleteFileExpires($file) {
+    public function deleteFileExpires(string $file)
+    {
         if (file_exists($file)) {
-            unlink($file);
+            @unlink($file);
         }
     }
 }
