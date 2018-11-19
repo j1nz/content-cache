@@ -1,6 +1,7 @@
 {
     "name": "lovecoding/content-cache",
     "description": "A simple package - for web service made by SLim Framework, that's helps you cache your content on server. One time handle, more times using.",
+    "keywords": ["content-cache", "cache-storage", "web-service", "web-api", "slim", "slim 3"],
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -9,7 +10,6 @@
             "email": "lethethangdn@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": ">=7.0.0",
         "psr/http-message": "^1.0"
