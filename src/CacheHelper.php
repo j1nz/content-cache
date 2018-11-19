@@ -10,7 +10,8 @@ class CacheHelper {
     private $isExpires = true;
     private $rootDirCache;
 
-    public function __construct($rootDirCache) {
+    public function __construct(string $rootDirCache)
+    {
         // check write permission
         $this->checkWritePermissionDirectory($rootDirCache);
         $this->rootDirCache = $rootDirCache;
@@ -20,14 +21,16 @@ class CacheHelper {
      * @param $rootDirCache
      * @return CacheService
      */
-    public static function getInstance($rootDirCache) {
+    public static function getInstance(string $rootDirCache)
+    {
         if (self::$instance == null) {
             self::$instance = new self($rootDirCache);
         }
         return self::$instance;
     }
 
-    public function isExpires(bool $isExpires) {
+    public function isExpires(bool $isExpires)
+    {
         $this->isExpires = $isExpires;
     }
 
@@ -38,7 +41,8 @@ class CacheHelper {
      * @param $requestTarget
      * @return array|mixed|null
      */
-    public function getContent($requestTarget) {
+    public function getContent(string $requestTarget)
+    {
         $cacheIo = CacheIO::getInstance();
 
         // Create path base on request of end-user, this path is dir content cache file
@@ -84,7 +88,8 @@ class CacheHelper {
      * @param $requestTarget
      * @param array $data
      */
-    public function setContent($requestTarget, $content) {
+    public function setContent(string $requestTarget, string $content)
+    {
         //$requestTarget = strtolower($requestTarget);
 
         // create path save file cache
@@ -106,7 +111,9 @@ class CacheHelper {
      * @param int $month
      * @param int $year
      */
-    public function setExpires($requestTarget, $hours = 0, $minutes = 0, $second = 0, $day = 0, $month = 0, $year = 0) {
+    public function setExpires(string $requestTarget, int $hours = 0, int $minutes = 0, int $second = 0,
+        int $day = 0, int $month = 0, int $year = 0)
+    {
         if ($this->isExpires) {
             // create path save file contain time expires
             $requestTarget = $this->pathGenerator($requestTarget) .'_schedule';
@@ -120,7 +127,8 @@ class CacheHelper {
      * @param $requestTarget
      * @return string $path the path of file to cache
      */
-    public function pathGenerator($requestTarget) {
+    public function pathGenerator(string $requestTarget)
+    {
         $unsafeDirectoryPath = urldecode(
             parse_url($requestTarget, PHP_URL_PATH)
         );
@@ -138,7 +146,8 @@ class CacheHelper {
         return $path;
     }
 
-    public function checkWritePermissionDirectory($dir) {
+    public function checkWritePermissionDirectory(string $dir)
+    {
         if (!is_writable(dirname($dir))) {
             throw new RuntimeException('Cache\'s root directory must be writable');
         }
@@ -149,8 +158,9 @@ class CacheHelper {
      *
      * @param $format
      */
-    public function setDatetimeFormat($format) {
-        if ($format !== null) {
+    public function setDatetimeFormat(string $format)
+    {
+        if ($format !== '') {
             $this->datetimeFormat = $format;
         }
     }
@@ -159,8 +169,9 @@ class CacheHelper {
      * Set default timezone
      * @param Datestring $timezone
      */
-    public function setTimezone($timezone = null) {
-        if ($timezone !== null) {
+    public function setTimezone(string $timezone)
+    {
+        if ($timezone !== '') {
             $this->timezone = $timezone; 
         }
 
@@ -172,7 +183,8 @@ class CacheHelper {
      * @param  String $json Json string
      * @return Array  array
      */
-    public function json_2_array($json) {
+    public function json_2_array(string $json) : array
+    {
         if ($json == '') {
             return [];
         }
@@ -184,7 +196,8 @@ class CacheHelper {
      * @param  array  $array Array object
      * @return String        Json string
      */
-    public function array_2_json(array $array) {
+    public function array_2_json(array $array) : string
+    {
         if ($array == null) {
             return '{}';
         }

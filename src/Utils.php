@@ -13,18 +13,18 @@ class Utils {
             foreach ($files as $file) {
                 if (in_array($file->getBasename(), array('.', '..')) !== true) {
                     if ($file->isDir() === true) {
-                        rmdir($file->getPathName());
+                        @rmdir($file->getPathName());
                     }
 
                     else if (($file->isFile() === true) || ($file->isLink() === true)) {
-                        unlink($file->getPathname());
+                        @unlink($file->getPathname());
                     }
                 }
             }
-            return rmdir($path);
+            return @rmdir($path);
 
         } else if ((is_file($path) === true) || (is_link($path) === true)) {
-            return unlink($path);
+            return @unlink($path);
         }
 
         return false;
@@ -32,7 +32,7 @@ class Utils {
 
     public static function createMultipleFolder($path) {
         if( !is_dir($path) ) {
-            mkdir($path, 0775, true);
+            @mkdir($path, 0775, true);
         }
     }
 }

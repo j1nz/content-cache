@@ -16,7 +16,8 @@ class CacheProvider {
     private $saltAddToPath;
     private $requestTarget;
 
-    public function __construct($cacheRootDir) {
+    public function __construct($cacheRootDir)
+    {
         $this->cacheHelper = CacheHelper::getInstance($cacheRootDir);
     }
 
@@ -26,7 +27,8 @@ class CacheProvider {
      * @param  callable $callable
      * @return mixed
      */
-    public function cache(Request $request, callable $callable) {
+    public function cache(Request $request, callable $callable)
+    {
         $dataContentCache = null;
 
         $content = $this->readCache($request);
@@ -54,7 +56,8 @@ class CacheProvider {
      * @param  callable $callable
      * @return Array
      */
-    public function cacheArray(Request $request, callable $callable) {
+    public function cacheArray(Request $request, callable $callable) : array
+    {
         $dataArrayCache = null;
 
         $content = $this->readCache($request);
@@ -83,12 +86,14 @@ class CacheProvider {
      * @param  Integer $hours
      * @return static        
      */
-    public function withExpires($hours) {
+    public function withExpires(int $hours) : self
+    {
         $this->times = $hours;
         return $this;
     }
 
-    public function isNeverExpires() {
+    public function isNeverExpires() : self
+    {
         $this->cacheHelper->isExpires(false);
         return $this;
     }
@@ -98,7 +103,8 @@ class CacheProvider {
      * @param  String $salt
      * @return static       
      */
-    public function salt($salt) {
+    public function salt(string $salt) : self
+    {
         $this->saltAddToPath = $salt;
         return $this;
     }
@@ -108,7 +114,8 @@ class CacheProvider {
      * @param  String $target Replace $request->getRequestTarget() is default
      * @return static
      */
-    public function customRequestTarget($target) {
+    public function customRequestTarget(string $target) : self
+    {
         $this->requestTarget = $target;
         return $this;
     }
@@ -119,7 +126,8 @@ class CacheProvider {
      * @param  Request $request Get current path
      * @param  String  $content Content needed cache
      */
-    private function writeCache(Request $request, $content) {
+    private function writeCache(Request $request, string $content)
+    {
         $requestTarget = $this->createTargetPath($request);
 
         $this->cacheHelper->setContent($requestTarget, $content);
@@ -131,7 +139,8 @@ class CacheProvider {
      * @param  Request $request Client request
      * @return mixed           Content have been cached
      */
-    private function readCache(Request $request) {
+    private function readCache(Request $request)
+    {
         $requestTarget = $this->createTargetPath($request);
         return $this->cacheHelper->getContent($requestTarget);
     }
@@ -141,7 +150,8 @@ class CacheProvider {
      * @param  Request $request Client request
      * @return String           Target path to disk content cache
      */
-    private function createTargetPath(Request $request) {
+    private function createTargetPath(Request $request) : string
+    {
         $requestTarget = $request->getRequestTarget();
 
         if ($this->requestTarget) {
@@ -158,7 +168,8 @@ class CacheProvider {
     /**
      * Set default value for properties
      */
-    private function rollbackPropertiesDefault() {
+    private function rollbackPropertiesDefault()
+    {
         $this->saltAddToPath = null;
         $this->requestTarget = null;
         $this->times = 4;
