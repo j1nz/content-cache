@@ -15,14 +15,18 @@ class CacheProvider {
     private $times = 4;
     private $saltAddToPath;
     private $requestTarget;
+    // Just enable caching in production mode.
+    private $isProduction;
 
-    public function __construct($cacheRootDir)
+    public function __construct(string $cacheRootDir, bool $isProduction = true)
     {
         $this->cacheHelper = CacheHelper::getInstance($cacheRootDir);
+        $this->isProduction = $isProduction;
     }
 
     /**
      * Cache any type to cache dir in server
+     * 
      * @param  Request  $request
      * @param  callable $callable
      * @return mixed
@@ -71,7 +75,7 @@ class CacheProvider {
                 throw new InvalidArgumentException('Callable must be return an array');
             }
 
-            if ($dataArrayCache != '{}') {
+            if ($dataArrayCache !== '{}') {
                 $this->writeCache($request, $this->cacheHelper->array_2_json($dataArrayCache));
             }
         }
@@ -128,6 +132,10 @@ class CacheProvider {
      */
     private function writeCache(Request $request, string $content)
     {
+        if (!$this->isProduction) {
+            return false;
+        }
+
         $requestTarget = $this->createTargetPath($request);
 
         $this->cacheHelper->setContent($requestTarget, $content);
@@ -141,6 +149,10 @@ class CacheProvider {
      */
     private function readCache(Request $request)
     {
+        if (!$this->isProduction) {
+            return null;
+        }
+
         $requestTarget = $this->createTargetPath($request);
         return $this->cacheHelper->getContent($requestTarget);
     }
